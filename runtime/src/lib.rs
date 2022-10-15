@@ -45,8 +45,8 @@ use pallet_transaction_payment::{ConstFeeMultiplier, CurrencyAdapter, Multiplier
 pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
-/// Import the template pallet.
-pub use pallet_template;
+/// Import the oracle event feed pallet.
+pub use oracle_event_feed;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -144,6 +144,9 @@ parameter_types! {
 	pub BlockLength: frame_system::limits::BlockLength = frame_system::limits::BlockLength
 		::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
 	pub const SS58Prefix: u8 = 42;
+	pub const  MaxValue: u32 = 6;
+	pub const KeyLimit:u32 = 15;
+
 }
 
 // Configure FRAME pallets to include in runtime.
@@ -270,10 +273,14 @@ impl pallet_sudo::Config for Runtime {
 	type RuntimeCall = RuntimeCall;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
+impl oracle_event_feed::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
+	type MaxValue = MaxValue;
+	type KeyLimit = KeyLimit;
+	type TimeProvider = Timestamp;
+
 }
+
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
@@ -292,7 +299,7 @@ construct_runtime!(
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
 		// Include the custom logic from the pallet-template in the runtime.
-		TemplateModule: pallet_template,
+		OracleEventFeed:oracle_event_feed,
 	}
 );
 
@@ -339,7 +346,7 @@ mod benches {
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
-		[pallet_template, TemplateModule]
+		[oracle_event_feed, OracleEventFeed]
 	);
 }
 
