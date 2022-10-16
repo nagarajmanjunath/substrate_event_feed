@@ -1,4 +1,4 @@
-use crate as pallet_oracle_feed;
+use crate as pallet_template;
 use frame_support::traits::{ConstU16, ConstU64};
 use frame_system as system;
 use sp_core::H256;
@@ -6,8 +6,6 @@ use sp_runtime::{
 	testing::Header,
 	traits::{BlakeTwo256, IdentityLookup},
 };
-// use frame_support::traits::UnixTime;
-
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -20,22 +18,17 @@ frame_support::construct_runtime!(
 		UncheckedExtrinsic = UncheckedExtrinsic,
 	{
 		System: frame_system,
-		OraclePalletTesting: pallet_oracle_feed::{Pallet, Call, Storage, Event<T>},
-		Timestamp: pallet_timestamp,
-
-
-
+		TemplateModule: pallet_template,
 	}
 );
-
 
 impl system::Config for Test {
 	type BaseCallFilter = frame_support::traits::Everything;
 	type BlockWeights = ();
 	type BlockLength = ();
 	type DbWeight = ();
-	type Origin = Origin;
-	type Call = Call;
+	type RuntimeOrigin = RuntimeOrigin;
+	type RuntimeCall = RuntimeCall;
 	type Index = u64;
 	type BlockNumber = u64;
 	type Hash = H256;
@@ -43,7 +36,7 @@ impl system::Config for Test {
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
-	type Event = Event;
+	type RuntimeEvent = RuntimeEvent;
 	type BlockHashCount = ConstU64<250>;
 	type Version = ();
 	type PalletInfo = PalletInfo;
@@ -56,32 +49,11 @@ impl system::Config for Test {
 	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
-frame_support::parameter_types! {
-	pub const MaxValue: u32 = 6;
-	pub const KeyLimit:u32 = 90;
-
-
-
-}
-
-impl pallet_timestamp::Config for Test {
-	/// A timestamp: milliseconds since the unix epoch.
-	type Moment = u64;
-	type OnTimestampSet = ();
-	type MinimumPeriod = ConstU64<43>;
-	type WeightInfo = ();
-}
-
-impl pallet_oracle_feed::Config for Test {
-	type Event = Event;
-	type MaxValue = MaxValue;
-	type KeyLimit= KeyLimit;
-	type TimeProvider= Timestamp;
+impl pallet_template::Config for Test {
+	type RuntimeEvent = RuntimeEvent;
 }
 
 // Build genesis storage according to the mock runtime.
 pub fn new_test_ext() -> sp_io::TestExternalities {
-    let mut ext: sp_io::TestExternalities = system::GenesisConfig::default().build_storage::<Test>().unwrap().into();
-	ext.execute_with(|| System::set_block_number(1));
-    ext
+	system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
 }
