@@ -5,14 +5,10 @@
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
 
-#[cfg(test)]
-mod mock;
-
-#[cfg(test)]
-mod tests;
-
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+
+
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -89,5 +85,33 @@ pub mod pallet {
 			Ok(())
 		}
 
+	
+
 	}
+	#[pallet::hooks]
+	impl<T: Config> Hooks<T::BlockNumber> for Pallet<T> {
+		fn on_initialize(_block_number: T::BlockNumber) -> Weight {
+			// Remove all events that are older than one hour
+			// 1 hour = 60 minutes = 60 * 60 seconds = 3600 seconds
+			Self::validate_event(50);
+			Weight::zero()
+		}
+	}
+	impl<T: Config> Pallet<T> {
+	pub fn validate_event(time_threshold: u64) {
+		let previous_hour = T::UnixTime::now().as_secs().saturating_sub(time_threshold);
+		let valid_feed: Option<Vec<OracleFeed>> = match SetEventFeed::<T>::take() {
+			Some(event_feed) => {
+				let v: Vec<OracleFeed> =
+					event_feed.into_iter().filter(|event| event.created_at > previous_hour).collect();
+				match v.is_empty() {
+					true => None,
+					false => Some(v),
+				}
+			},
+			None => None,
+		};
+		SetEventFeed::<T>::set(valid_feed);
+	}
+}
 }
