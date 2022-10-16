@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "node",
+    "pallets/oracle_event",
     "runtime",
 ]
 [profile.release]
