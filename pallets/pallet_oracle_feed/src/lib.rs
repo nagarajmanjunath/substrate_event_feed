@@ -1,12 +1,13 @@
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub use pallet::*;
 
-// #[cfg(test)]
-// mod mock;
+#[cfg(test)]
+mod mock;
 
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -25,7 +26,7 @@ pub mod pallet {
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
-		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
+		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 		type MaxValue: Get<u32>;
 		type KeyLimit: Get<u32>;
 		type TimeProvider: UnixTime;
@@ -38,6 +39,7 @@ pub mod pallet {
 
 
 	// The struct to organize anf group together each events
+
 	#[derive(Encode, Decode, PartialEq, MaxEncodedLen, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	#[codec(mel_bound())]
@@ -80,7 +82,7 @@ pub mod pallet {
 	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 		fn on_initialize(_: T::BlockNumber) -> Weight {
 			// here we fetch the current blocktime - 3600 seconds(1 hour)
-			let time: u64 = T::TimeProvider::now().as_secs().saturating_sub(10000) ;
+			let time: u64 = T::TimeProvider::now().as_secs().saturating_sub(100) ;
 			// And we iterate over the stored event's time stamp
 			//And remove those event which is less than or equal to 'time' variable value
 			<RootOracleEvent<T>>::mutate(|event_list| {
@@ -99,6 +101,8 @@ pub mod pallet {
 
 	
 	}
+
+
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
@@ -119,7 +123,7 @@ pub mod pallet {
 
 		) -> DispatchResult {
 
-			//check weather the call is made by sudo user
+			//check wheather the call is made by the Root origin(sudo user)
 			//In dev chain by default `Alice` is the sudo user
 			ensure_root(origin)?;
 			
@@ -156,3 +160,6 @@ pub mod pallet {
 
 
 }
+
+
+
