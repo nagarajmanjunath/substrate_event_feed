@@ -1,5 +1,5 @@
 [package]
-name = "pallet_oracle_feed"
+name = "oracle_event_feed"
 version = "4.0.0-dev"
 description = "FRAME pallet template for defining custom runtime logic."
 authors = ["Substrate DevHub <https://github.com/substrate-developer-hub>"]
