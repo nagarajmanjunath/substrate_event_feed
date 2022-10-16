@@ -47,7 +47,7 @@ pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
 /// Import the template pallet.
-pub use pallet_oracle_feed;
+pub use oracle_event_feed;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -289,8 +289,8 @@ impl pallet_sudo::Config for Runtime {
 
 }
 
-/// Configure the pallet_oracle_feed in pallets/pallet_oracle_feed.
-impl pallet_oracle_feed::Config for Runtime {
+/// Configure the oracle_event_feed in pallets/oracle_event_feed.
+impl oracle_event_feed::Config for Runtime {
 	type Event = Event;
 	type MaxValue = MaxValue;
 	type KeyLimit = KeyLimit;
@@ -364,8 +364,8 @@ construct_runtime!(
 		Balances: pallet_balances,
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
-		// Include the custom logic from the pallet_oracle_feed in the runtime.
-		OracleEventFeed: pallet_oracle_feed,
+		// Include the custom logic from the oracle_event_feed in the runtime.
+		OracleEventFeed: oracle_event_feed,
 		Nicks: pallet_nicks,
 		Contracts: pallet_contracts,
 
@@ -416,7 +416,7 @@ mod benches {
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
-		[pallet_oracle_feed, OracleEventFeed]
+		[oracle_event_feed, OracleEventFeed]
 	);
 }
 
